@@ -1,6 +1,4 @@
-'use strict';
-
-const helpers = require('./helpers');
+const path = require('path');
 const webpack = require('webpack');
 //plugins
 const AotPlugin = require('@ngtools/webpack').AotPlugin;
@@ -17,13 +15,13 @@ module.exports = {
     polyfills: "./src/polyfills.aot.ts"
   },
   output: {
-    path: helpers.root('dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: "[name].bundle.js",
     chunkFilename: '[id].chunk.js'
   },
   resolve: {
   	extensions: ['.js', '.ts', '.json'],
-  	 modules: [helpers.root('src'), 'node_modules'],
+  	 modules: [path.resolve(__dirname, 'src'), 'node_modules'],
   },
   module: {
     rules: [
@@ -39,7 +37,7 @@ module.exports = {
       {
         test: /\.html$/,
         loader: 'raw-loader',
-        exclude: [helpers.root('src/index.html')]
+        exclude: [path.resolve(__dirname, 'src/index.html')]
       },
       {
         test: /\.(jpg|png|gif)$/,
@@ -58,7 +56,7 @@ module.exports = {
     }),
     new AotPlugin({
       tsConfigPath: './tsconfig.aot.json',
-      entryModule: helpers.root('src/app/app.module#AppModule')
+      entryModule: path.resolve(__dirname, 'src/app/app.module#AppModule')
     }),
     new HtmlWebpackPlugin({
     	template: 'src/index.html',

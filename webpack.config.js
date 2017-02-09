@@ -1,6 +1,4 @@
-'use strict';
-
-const helpers = require('./helpers');
+const path = require('path');
 const webpack = require('webpack');
 //plugins
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
@@ -16,13 +14,13 @@ module.exports = {
     polyfills: "./src/polyfills.ts"
   },
   output: {
-    path: helpers.root('dist'),
+    path: path.resolve(__dirname, 'dist'),
     filename: "[name].bundle.js",
     chunkFilename: '[id].chunk.js'
   },
   resolve: {
   	extensions: ['.js', '.ts', '.json'],
-  	 modules: [helpers.root('src'), 'node_modules'],
+  	 modules: [path.resolve(__dirname, 'src'), 'node_modules'],
   },
   module: {
     rules: [
@@ -42,7 +40,7 @@ module.exports = {
       {
         test: /\.html$/,
         loader: 'raw-loader',
-        exclude: [helpers.root('src/index.html')]
+        exclude: [path.resolve(__dirname, 'src/index.html')]
       },
       {
         test: /\.(jpg|png|gif)$/,
@@ -69,7 +67,7 @@ module.exports = {
     new ContextReplacementPlugin(
       // The (\\|\/) piece accounts for path separators in *nix and Windows
       /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
-      helpers.root('src') // location of your src
+      path.resolve(__dirname, 'src') // location of your src
     ),
     new HtmlWebpackPlugin({
     	template: 'src/index.html',
@@ -91,4 +89,8 @@ module.exports = {
     //     }
     // })
   ],
+  devServer: {
+    port: 4200,
+    historyApiFallback:true
+  }
 };
