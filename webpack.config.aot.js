@@ -2,7 +2,6 @@ const path = require('path');
 const webpack = require('webpack');
 //plugins
 const AotPlugin = require('@ngtools/webpack').AotPlugin;
-const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
