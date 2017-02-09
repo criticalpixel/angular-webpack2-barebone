@@ -7,11 +7,11 @@ Angular seed with webpack 2 - barebone
 - This is not intended for use in production!
 
 # npm commands 
- * Buiild commands *
+### Buiild commands
  - npm run build
  - npm run build:aot
- * Serve commands *
+### Serve commands
  - npm run server
  - npm run server:aot
- * run AOT & express server on :3000 *
+### run AOT & express server on :3000
  - npm run production
