@@ -1,20 +1,19 @@
 'use strict';
 
-const webpack = require("webpack");
-const helpers = require('./config/helpers');
+const helpers = require('./helpers');
+const webpack = require('webpack');
 //plugins
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
-const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
+const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
-
-//When in Prod mode .. ( separate this later...)
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+
 module.exports = {
   entry: {
-    main: "./src/main.browser.ts",
-    vendors: "./src/vendor.browser.ts",
-    polyfills: "./src/polyfills.browser.ts",
+    main: "./src/main.ts",
+    polyfills: "./src/polyfills.ts"
   },
   output: {
     path: helpers.root('dist'),
@@ -22,7 +21,7 @@ module.exports = {
     chunkFilename: '[id].chunk.js'
   },
   resolve: {
-  	extensions: ['.js', '.ts'],
+  	extensions: ['.js', '.ts', '.json'],
   	 modules: [helpers.root('src'), 'node_modules'],
   },
   module: {
@@ -56,12 +55,17 @@ module.exports = {
     ]
   },
   plugins: [
-  	new webpack.optimize.CommonsChunkPlugin({
-      name: "commons",
-      filename: "commons.js",
-      minChunks: 2,
+    // This enables tree shaking of the vendor modules
+    new CommonsChunkPlugin({
+            name: 'polyfills',
+            chunks: ['polyfills']
+        }),
+    new CommonsChunkPlugin({
+        name: 'vendor',
+        chunks: ['main'],
+        minChunks: module => /node_modules\//.test(module.resource)
     }),
-    new ForkCheckerPlugin(),
+    new CheckerPlugin(),
     new ContextReplacementPlugin(
       // The (\\|\/) piece accounts for path separators in *nix and Windows
       /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
@@ -75,33 +79,16 @@ module.exports = {
     new ScriptExtHtmlWebpackPlugin({
       defaultAttribute: 'defer'
     }),
-    new UglifyJsPlugin({
-      // beautify: true, //debug
-      // mangle: false, //debug
-      // dead_code: false, //debug
-      // unused: false, //debug
-      // deadCode: false, //debug
-      // compress: {
-      //   screw_ie8: true,
-      //   keep_fnames: true,
-      //   drop_debugger: false,
-      //   dead_code: false,
-      //   unused: false
-      // }, // debug
-      // comments: true, //debug
-
-
-      beautify: false, //prod
-      mangle: {
-        screw_ie8: true,
-        keep_fnames: true
-      }, //prod
-      compress: {
-        screw_ie8: true,
-        warnings:false,
-        keep_fnames: false,
-      }, //prod
-      comments: false, //prod
-    }),
+    // new UglifyJsPlugin({
+    //     beautify: false,
+    //     comments: false,
+    //     compress: {
+    //         screw_ie8: true,
+    //         warnings: false
+    //     },
+    //     mangle: {
+    //         screw_i8: true
+    //     }
+    // })
   ],
 };

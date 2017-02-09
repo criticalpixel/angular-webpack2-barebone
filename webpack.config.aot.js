@@ -1,21 +1,20 @@
 'use strict';
 
-const webpack = require("webpack");
-const helpers = require('./config/helpers');
+const helpers = require('./helpers');
+const webpack = require('webpack');
 //plugins
+const AotPlugin = require('@ngtools/webpack').AotPlugin;
 const ContextReplacementPlugin = require('webpack/lib/ContextReplacementPlugin');
-const ForkCheckerPlugin = require('awesome-typescript-loader').ForkCheckerPlugin;
+const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
+const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const NamedModulesPlugin = require('webpack/lib/NamedModulesPlugin');
 const ScriptExtHtmlWebpackPlugin = require('script-ext-html-webpack-plugin');
-
-//When in Prod mode .. ( separate this later...)
 const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+
 module.exports = {
   entry: {
-    main: "./src/main.aot.browser.ts",
-    vendors: "./src/vendor.browser.ts",
-    polyfills: "./src/polyfills.aot.browser.ts",
+    main: "./src/main.aot.ts",
+    polyfills: "./src/polyfills.aot.ts"
   },
   output: {
     path: helpers.root('dist'),
@@ -23,18 +22,14 @@ module.exports = {
     chunkFilename: '[id].chunk.js'
   },
   resolve: {
-  	extensions: ['.js', '.ts'],
+  	extensions: ['.js', '.ts', '.json'],
   	 modules: [helpers.root('src'), 'node_modules'],
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        loaders: [
-          'awesome-typescript-loader',
-          'angular2-template-loader',
-          'angular2-router-loader?loader=system&genDir=src/compiled/src/app&aot=true'
-        ],
+        loader: '@ngtools/webpack',
         exclude: [/\.(spec|e2e)\.ts$/]
       },
       {
@@ -57,48 +52,36 @@ module.exports = {
     ]
   },
   plugins: [
-  	new webpack.optimize.CommonsChunkPlugin({
-      name: "commons",
-      filename: "commons.js",
-      minChunks: 2,
+    new CommonsChunkPlugin({
+        name: 'polyfills',
+        chunks: ['main']
     }),
-    new ForkCheckerPlugin(),
-    new ContextReplacementPlugin(
-      // The (\\|\/) piece accounts for path separators in *nix and Windows
-      /angular(\\|\/)core(\\|\/)(esm(\\|\/)src|src)(\\|\/)linker/,
-      helpers.root('src') // location of your src
-    ),
+    new AotPlugin({
+      tsConfigPath: './tsconfig.aot.json',
+      entryModule: helpers.root('src/app/app.module#AppModule')
+    }),
     new HtmlWebpackPlugin({
     	template: 'src/index.html',
     	chunksSortMode: 'dependency',
     	inject:'head'
     }),
-    new NamedModulesPlugin(),
     new ScriptExtHtmlWebpackPlugin({
       defaultAttribute: 'defer'
     }),
     new UglifyJsPlugin({
         beautify: false,
         comments: false,
-        compress: { warnings: false,drop_console: true },
-      }),
+        compress: {
+            screw_ie8: true,
+            warnings: false
+        },
+        mangle: {
+            screw_i8: true
+        }
+    })
   ],
   devServer: {
-    contentBase: './src/compiled',
     port: 4200,
-    historyApiFallback: {
-      disableDotRule: true,
-    }
-  },
-  node: {
-    global: true,
-    process: true,
-    Buffer: false,
-    crypto: true,
-    module: false,
-    clearImmediate: false,
-    setImmediate: false,
-    clearTimeout: true,
-    setTimeout: true
+    historyApiFallback:true
   }
 };

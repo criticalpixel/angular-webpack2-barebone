@@ -1,5 +1,6 @@
+import 'core-js/es7/reflect';
 import { platformBrowser }    from '@angular/platform-browser';
-import { AppModuleNgFactory } from './compiled/src/app/app.module.ngfactory';
+import { AppModuleNgFactory } from './ngfactory/src/app/app.module.ngfactory';
 import { enableProdMode } from '@angular/core';
 import { environment } from './app/environment';
 

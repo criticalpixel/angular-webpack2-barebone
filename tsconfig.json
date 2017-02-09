@@ -14,7 +14,7 @@
     },
     "lib": [
       "dom",
-      "es6"
+      "es2015"
     ],
     "types": [
       "node",
@@ -25,7 +25,10 @@
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/ngfactory",
+    "src/main.aot.ts",
+    "src/polyfills.aot.ts"
   ],
   "awesomeTypescriptLoaderOptions": {
     "useWebpackText": true
